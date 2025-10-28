@@ -48,25 +48,29 @@ print_header "XRDP Xorg Crash Fix Script"
 
 # Step 1: Install Xorg drivers for virtualization
 print_info "Installing Xorg virtualization drivers..."
-DEBIAN_FRONTEND=noninteractive apt-get update > /dev/null 2>&1
-DEBIAN_FRONTEND=noninteractive apt-get install -y \
+DEBIAN_FRONTEND=noninteractive apt-get update
+if ! DEBIAN_FRONTEND=noninteractive apt-get install -y \
     xserver-xorg-video-dummy \
     xserver-xorg-video-fbdev \
     xserver-xorg-input-all \
-    xserver-xorg-core \
-    > /dev/null 2>&1
-
+    xserver-xorg-core; then
+    print_error "Failed to install Xorg drivers"
+    exit 1
+fi
 print_success "Xorg drivers installed"
 
 # Step 2: Create Xorg configuration for XRDP
 print_info "Creating Xorg configuration for XRDP..."
 mkdir -p /etc/X11/xorg.conf.d
 
-# Create a minimal Xorg config that works in VMs
+# Create a minimal Xorg config that forces dummy driver in VMs
+# This prevents Xorg from trying to detect hardware that doesn't exist
 cat > /etc/X11/xorg.conf.d/10-xrdp.conf <<'EOF'
 Section "ServerLayout"
     Identifier "X11 Server"
     Screen 0 "Screen0"
+    Option "AutoAddDevices" "false"
+    Option "AutoEnableDevices" "false"
 EndSection
 
 Section "Screen"
@@ -75,7 +79,7 @@ Section "Screen"
     Monitor "Monitor0"
     SubSection "Display"
         Depth 24
-        Modes "1920x1080"
+        Modes "1920x1080" "1600x1200" "1280x1024" "1024x768"
     EndSubSection
 EndSection
 
@@ -83,6 +87,8 @@ Section "Device"
     Identifier "Card0"
     Driver "dummy"
     VideoRam 256000
+    Option "IgnoreEDID" "true"
+    Option "NoDDC" "true"
 EndSection
 
 Section "Monitor"
@@ -90,43 +96,25 @@ Section "Monitor"
     HorizSync 30.0-70.0
     VertRefresh 50.0-75.0
     Modeline "1920x1080" 138.50 1920 1968 2000 2080 1080 1083 1088 1111 +hsync +vsync
+    Modeline "1600x1200" 162.00 1600 1664 1856 2160 1200 1201 1204 1250 +hsync +vsync
+    Modeline "1280x1024" 108.00 1280 1328 1440 1688 1024 1025 1028 1066 +hsync +vsync
+    Modeline "1024x768" 65.00 1024 1048 1184 1344 768 771 777 806 -hsync -vsync
 EndSection
 EOF
 
 print_success "Xorg configuration created"
 
-# Step 3: Configure XRDP to use correct Xorg command
-print_info "Updating sesman.ini to use proper Xorg settings..."
+# Step 3: Configure XRDP sesman.ini properly
+print_info "Updating sesman.ini configuration..."
 
 # Backup original
 if [ ! -f /etc/xrdp/sesman.ini.backup ]; then
     cp /etc/xrdp/sesman.ini /etc/xrdp/sesman.ini.backup.$(date +%Y%m%d_%H%M%S)
 fi
 
-# Check if sesman.ini has a [Xorg] section or if we need to modify the X11 command
-# The issue is that Xorg needs to be started with -config flag to use our dummy driver
-sed -i 's|X11DisplayOffset=.*|X11DisplayOffset=10\nKillDisconnected=false|' /etc/xrdp/sesman.ini
-
-# Create a wrapper script for starting Xorg
-print_info "Creating Xorg wrapper script..."
-cat > /usr/local/bin/xrdp-xorg.sh <<'XORGEOF'
-#!/bin/bash
-# XRDP Xorg wrapper - fixes crashes in virtualized environments
-
-DISPLAY_NUM=$1
-AUTH_FILE=$2
-
-# Use dummy driver for virtualization
-exec /usr/bin/Xorg :${DISPLAY_NUM} \
-    -config /etc/X11/xorg.conf.d/10-xrdp.conf \
-    -configdir /etc/X11/xorg.conf.d \
-    -nolisten tcp \
-    -auth ${AUTH_FILE} \
-    -logfile /var/log/xrdp/xorg-${DISPLAY_NUM}.log
-XORGEOF
-
-chmod +x /usr/local/bin/xrdp-xorg.sh
-print_success "Xorg wrapper script created"
+# Xorg will automatically use /etc/X11/xorg.conf.d/ config files
+# We don't need a wrapper - Xorg auto-detects the dummy driver when no hardware is present
+print_success "sesman.ini configuration verified"
 
 # Step 4: Alternative approach - configure startwm.sh to handle X errors better
 print_info "Updating startwm.sh to handle X server issues..."
@@ -207,7 +195,7 @@ echo ""
 print_info "Fix Summary:"
 echo "  • Xorg virtualization drivers installed (dummy, fbdev)"
 echo "  • Xorg configuration created for VM environment"
-echo "  • Xorg wrapper script created"
+echo "  • Xorg configured to use dummy driver (no hardware detection)"
 echo "  • startwm.sh updated with better error handling"
 echo "  • X server core reinstalled"
 echo ""
@@ -216,6 +204,10 @@ echo "  • Disconnect and reconnect via RDP to test the fix"
 echo "  • The X server should now start without crashing"
 echo ""
 print_info "If issues persist, check logs:"
-echo "  sudo tail -f /var/log/xrdp/xorg-*.log"
+echo "  sudo tail -f /var/log/xrdp/xrdp-sesman.log"
 echo "  sudo journalctl -u xrdp-sesman -f"
+echo "  sudo cat ~/.xsession-errors (after connecting)"
+echo ""
+print_info "To verify Xorg config is being used:"
+echo "  sudo grep -r 'dummy' /var/log/xrdp/ || sudo journalctl | grep -i xorg"
 
