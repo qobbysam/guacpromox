@@ -240,6 +240,11 @@ cd /opt/guacamole
 6. Password: [password]
 7. Save
 
+> **📖 For detailed step-by-step instructions with all configuration options, see:**  
+> **`GUACAMOLE-RDP-SETUP.md`** - Complete guide with all settings, troubleshooting, and advanced options  
+> **📘 For comprehensive reference of ALL available options:**  
+> **`../guacoption.pdf`** - Exhaustive PDF documentation of every Guacamole connection parameter
+
 **Assign permissions:**
 1. Click on connection → Permissions
 2. Add group: admins (Read access)

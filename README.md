@@ -7,6 +7,7 @@ A complete solution for deploying a multi-user remote desktop environment with s
 ```
 guacproject/
 ├── README.md                    # This file
+├── guacoption.pdf               # Complete Guacamole options reference (all parameters)
 ├── bmax-desktop/                 # Desktop VM components
 │   ├── setup-desktop-vm.sh      # VM setup script
 │   ├── launch-chrome.sh         # Chrome launcher with session isolation
@@ -22,7 +23,10 @@ guacproject/
     ├── setup-cloudflare-tunnel.sh # Cloudflare setup
     ├── README-ADMIN.txt          # Admin guide
     ├── DEPLOYMENT-GUIDE.md       # Complete deployment guide
-    └── README.md                # Server documentation
+    ├── GUACAMOLE-RDP-SETUP.md    # Step-by-step RDP connection setup guide
+    ├── DASHBOARD-CONFIGURATION-GUIDE.md # Complete dashboard options reference
+    ├── CONFIGURATION-REFERENCE.md # Docker/server configuration options
+    └── README.md                  # Server documentation
 ```
 
 ## Quick Start
@@ -123,7 +127,10 @@ See `guacserver/DEPLOYMENT-GUIDE.md` for complete instructions.
 
 ## Documentation
 
+- **📘 Complete Options Reference**: `guacoption.pdf` - Comprehensive PDF with all Guacamole connection options and detailed parameter descriptions
+- **Configuration Reference**: `guacserver/CONFIGURATION-REFERENCE.md` - All Docker environment variables and configuration options
 - **Deployment Guide**: `guacserver/DEPLOYMENT-GUIDE.md`
+- **RDP Connection Setup**: `guacserver/GUACAMOLE-RDP-SETUP.md` - Step-by-step guide for adding RDP connections
 - **Admin Guide**: `guacserver/README-ADMIN.txt`
 - **User Guide**: `bmax-desktop/README-DESKTOP.txt`
 - **Desktop VM Setup**: `bmax-desktop/README.md`

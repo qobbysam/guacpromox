@@ -101,6 +101,35 @@ if ! docker --version >> "$LOG_FILE" 2>&1; then
     exit 1
 fi
 
+# Determine which Docker Compose command to use
+DOCKER_COMPOSE_CMD=""
+if docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+    print_success "Using Docker Compose plugin (docker compose)"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+    print_success "Using Docker Compose standalone (docker-compose)"
+else
+    print_info "Docker Compose not found, installing standalone version..."
+    # Install docker-compose standalone
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m)
+    if [[ "$ARCH" == "x86_64" ]]; then
+        ARCH="x86_64"
+    elif [[ "$ARCH" == "aarch64" ]] || [[ "$ARCH" == "arm64" ]]; then
+        ARCH="aarch64"
+    fi
+    curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-${OS}-${ARCH}" -o /usr/local/bin/docker-compose >> "$LOG_FILE" 2>&1
+    chmod +x /usr/local/bin/docker-compose >> "$LOG_FILE" 2>&1
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+        print_success "Docker Compose installed"
+    else
+        print_error "Failed to install Docker Compose"
+        exit 1
+    fi
+fi
+
 # Save original directory and script directory
 ORIGINAL_DIR=$(pwd)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -132,15 +161,15 @@ for location in "${POSSIBLE_LOCATIONS[@]}"; do
 done
 
 if [[ -n "$DOCKER_COMPOSE_SRC" ]]; then
-    cp "$DOCKER_COMPOSE_SRC" "$INSTALL_DIR/docker-compose.yml"
-    chmod 644 "$INSTALL_DIR/docker-compose.yml"
-    print_success "Docker Compose file copied to: $INSTALL_DIR/docker-compose.yml"
+    DOCKER_COMPOSE_FILE="$DOCKER_COMPOSE_SRC"
+    COMPOSE_DIR=$(dirname "$DOCKER_COMPOSE_FILE")
+    print_success "Using docker-compose.yml from: $DOCKER_COMPOSE_FILE"
 else
     print_error "docker-compose.yml not found in any of these locations:"
     for location in "${POSSIBLE_LOCATIONS[@]}"; do
         echo "  • $location"
     done
-    print_warning "Please ensure docker-compose.yml is in the same directory as this script, or copy it manually to: $INSTALL_DIR/"
+    print_warning "Please ensure docker-compose.yml is in the same directory as this script"
     exit 1
 fi
 
@@ -164,7 +193,35 @@ done
 
 # Generate database initialization script
 print_info "Generating database initialization script..."
-docker run --rm guacamole/guacamole:$GUACAMOLE_VERSION /opt/guacamole/bin/initdb.sh --postgres > "$INSTALL_DIR/initdb.sql"
+# Create initdb.sql in the same directory as docker-compose.yml so relative paths work
+# According to Apache Guacamole docs, use --postgresql flag (not --postgres)
+print_info "Running initdb.sh to generate PostgreSQL schema..."
+# Run initdb.sh and capture both stdout and stderr, but only save stdout to initdb.sql
+docker run --rm guacamole/guacamole:$GUACAMOLE_VERSION /opt/guacamole/bin/initdb.sh --postgresql > "$COMPOSE_DIR/initdb.sql" 2>> "$LOG_FILE"
+DOCKER_INIT_EXIT_CODE=$?
+
+if [[ $DOCKER_INIT_EXIT_CODE -ne 0 ]]; then
+    print_error "Failed to generate database initialization script (exit code: $DOCKER_INIT_EXIT_CODE)"
+    print_info "Check log file for details: $LOG_FILE"
+    exit 1
+fi
+
+# Verify the initdb.sql file was created and contains SQL (not error messages)
+if [[ ! -s "$COMPOSE_DIR/initdb.sql" ]]; then
+    print_error "initdb.sql is empty"
+    exit 1
+fi
+
+# Check if it contains SQL statements (should start with -- or CREATE)
+if ! head -n 5 "$COMPOSE_DIR/initdb.sql" | grep -qE "^(--|CREATE|INSERT|GRANT)"; then
+    print_error "initdb.sql appears to contain errors instead of SQL"
+    print_info "First few lines of initdb.sql:"
+    head -n 10 "$COMPOSE_DIR/initdb.sql"
+    exit 1
+fi
+
+# Also keep a copy in INSTALL_DIR for reference
+cp "$COMPOSE_DIR/initdb.sql" "$INSTALL_DIR/initdb.sql"
 print_success "Database initialization script created"
 
 # Create .env file for docker-compose
@@ -177,24 +234,67 @@ print_success "Environment configuration created"
 
 # Start Guacamole stack
 print_info "Starting Guacamole stack..."
-cd "$INSTALL_DIR"
 
-# Verify docker-compose.yml exists in installation directory
-if [[ ! -f "$INSTALL_DIR/docker-compose.yml" ]]; then
-    print_error "docker-compose.yml not found in $INSTALL_DIR"
+# Verify docker-compose.yml still exists
+if [[ ! -f "$DOCKER_COMPOSE_FILE" ]]; then
+    print_error "docker-compose.yml not found at: $DOCKER_COMPOSE_FILE"
     print_error "Cannot start Guacamole stack without docker-compose.yml"
     exit 1
 fi
 
-print_info "Using docker-compose.yml from: $INSTALL_DIR/docker-compose.yml"
-docker compose up -d >> "$LOG_FILE" 2>&1
-DOCKER_EXIT_CODE=$?
+# Change to directory containing docker-compose.yml to ensure relative paths work
+cd "$COMPOSE_DIR"
+
+print_info "Using docker-compose.yml from: $DOCKER_COMPOSE_FILE"
+
+# Verify initdb.sql exists (required by docker-compose.yml)
+if [[ ! -f "$COMPOSE_DIR/initdb.sql" ]]; then
+    print_error "initdb.sql not found in $COMPOSE_DIR"
+    print_error "This file is required by docker-compose.yml"
+    exit 1
+fi
+
+# Verify .env file exists
+if [[ ! -f "$INSTALL_DIR/.env" ]]; then
+    print_error ".env file not found at $INSTALL_DIR/.env"
+    exit 1
+fi
+
+# Copy .env file to compose directory so docker compose can find it automatically
+# Docker Compose automatically looks for .env in the same directory as docker-compose.yml
+cp "$INSTALL_DIR/.env" "$COMPOSE_DIR/.env"
+chmod 600 "$COMPOSE_DIR/.env"
+print_info "Environment file ready: $COMPOSE_DIR/.env"
+
+# Check if containers are already running (might need cleanup if database failed to initialize)
+if $DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" ps | grep -q "Up"; then
+    print_warning "Some containers are already running"
+    print_info "If database initialization previously failed, you may need to remove volumes:"
+    print_info "  docker compose -f $DOCKER_COMPOSE_FILE down -v"
+    print_info "Then re-run this script."
+fi
+
+# Test docker compose command first
+print_info "Validating docker-compose.yml syntax..."
+if ! $DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" config > /dev/null 2>&1; then
+    print_error "Docker Compose configuration validation failed"
+    print_info "Running config check with output:"
+    $DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" config
+    exit 1
+fi
+
+# Explicitly specify the compose file path (docker compose will auto-load .env from same directory)
+print_info "Starting Docker containers..."
+$DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" up -d 2>&1 | tee -a "$LOG_FILE"
+DOCKER_EXIT_CODE=${PIPESTATUS[0]}
 
 if [[ $DOCKER_EXIT_CODE -ne 0 ]]; then
     print_error "Docker Compose failed with exit code: $DOCKER_EXIT_CODE"
+    print_info "Checking container status..."
+    $DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" ps 2>&1 | tee -a "$LOG_FILE"
     print_info "Checking logs..."
-    docker compose logs >> "$LOG_FILE" 2>&1
-    print_warning "See log file for details: $LOG_FILE"
+    $DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" logs --tail=50 2>&1 | tee -a "$LOG_FILE"
+    print_warning "See full log file for details: $LOG_FILE"
     exit $DOCKER_EXIT_CODE
 fi
 
@@ -203,12 +303,12 @@ print_info "Waiting for services to start (this may take 30-60 seconds)..."
 sleep 10
 
 # Check if containers are running
-CONTAINERS_RUNNING=$(docker compose ps | grep -c "Up")
+CONTAINERS_RUNNING=$($DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" ps | grep -c "Up")
 if [[ $CONTAINERS_RUNNING -ge 3 ]]; then
     print_success "All containers started successfully"
 else
     print_warning "Some containers may not be running properly"
-    docker compose ps
+    $DOCKER_COMPOSE_CMD -f "$DOCKER_COMPOSE_FILE" ps
 fi
 
 # Configure firewall
@@ -218,6 +318,21 @@ print_success "Firewall configured (port 8080 open)"
 
 # Create systemd service for auto-start
 print_info "Creating systemd service..."
+
+# Determine the full path for docker compose command in systemd
+# .env file will be in same directory as docker-compose.yml, so docker compose will auto-load it
+if [[ "$DOCKER_COMPOSE_CMD" == "docker compose" ]]; then
+    COMPOSE_START="/usr/bin/docker compose -f $DOCKER_COMPOSE_FILE up -d"
+    COMPOSE_STOP="/usr/bin/docker compose -f $DOCKER_COMPOSE_FILE down"
+elif command -v docker-compose &> /dev/null; then
+    COMPOSE_PATH=$(which docker-compose)
+    COMPOSE_START="$COMPOSE_PATH -f $DOCKER_COMPOSE_FILE up -d"
+    COMPOSE_STOP="$COMPOSE_PATH -f $DOCKER_COMPOSE_FILE down"
+else
+    COMPOSE_START="/usr/local/bin/docker-compose -f $DOCKER_COMPOSE_FILE up -d"
+    COMPOSE_STOP="/usr/local/bin/docker-compose -f $DOCKER_COMPOSE_FILE down"
+fi
+
 cat > /etc/systemd/system/guacamole.service <<EOF
 [Unit]
 Description=Guacamole Docker Compose Service
@@ -227,9 +342,9 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/bin/docker compose up -d
-ExecStop=/usr/bin/docker compose down
+WorkingDirectory=$COMPOSE_DIR
+ExecStart=$COMPOSE_START
+ExecStop=$COMPOSE_STOP
 TimeoutStartSec=0
 
 [Install]

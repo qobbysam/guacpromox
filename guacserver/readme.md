@@ -10,6 +10,9 @@ This directory contains all scripts and documentation needed to set up Apache Gu
 - **configure-guacamole.sh** - Interactive configuration guide
 - **setup-cloudflare-tunnel.sh** - Cloudflare Tunnel setup for internet access
 - **README-ADMIN.txt** - Administrator maintenance guide
+- **GUACAMOLE-RDP-SETUP.md** - Step-by-step guide for adding RDP connections
+- **DASHBOARD-CONFIGURATION-GUIDE.md** - Complete reference for ALL dashboard options and tabs
+- **CONFIGURATION-REFERENCE.md** - Complete reference for all Docker environment variables and configuration options
 
 ## Quick Start
 
@@ -86,6 +89,7 @@ Desktop VMs (XRDP) with Shared Chrome Config
 1. **Change default password** (Security critical!)
 2. **Create user groups** (admins, regular-users)
 3. **Create RDP connections** to desktop VMs
+   - **📖 See:** `GUACAMOLE-RDP-SETUP.md` for detailed step-by-step instructions
 4. **Assign permissions** to users/groups
 5. **Test concurrent access**
 
@@ -102,6 +106,9 @@ After basic setup:
 
 ## For more information
 
-- Administrator guide: README-ADMIN.txt
-- Desktop VM setup: See bmax-desktop directory
-- Full deployment guide: DEPLOYMENT-GUIDE.md
+- **📘 Complete Options Reference:** `../guacoption.pdf` - Comprehensive PDF with all Guacamole connection options
+- **Configuration Reference:** CONFIGURATION-REFERENCE.md - All Docker environment variables and guacamole.properties equivalents
+- **RDP Connection Setup:** GUACAMOLE-RDP-SETUP.md - Step-by-step dashboard configuration guide
+- **Administrator guide:** README-ADMIN.txt
+- **Desktop VM setup:** See bmax-desktop directory
+- **Full deployment guide:** DEPLOYMENT-GUIDE.md
