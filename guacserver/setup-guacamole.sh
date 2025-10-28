@@ -101,20 +101,66 @@ if ! docker --version >> "$LOG_FILE" 2>&1; then
     exit 1
 fi
 
+# Save original directory and script directory
+ORIGINAL_DIR=$(pwd)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # Create installation directory
 print_info "Creating installation directory..."
 mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR"
 print_success "Installation directory created: $INSTALL_DIR"
 
 # Copy docker-compose.yml to installation directory
-print_info "Copying docker-compose.yml..."
-if [[ -f docker-compose.yml ]]; then
-    cp docker-compose.yml "$INSTALL_DIR/"
-    print_success "Docker Compose file copied"
+print_info "Locating docker-compose.yml..."
+
+# Try to find docker-compose.yml in multiple locations
+DOCKER_COMPOSE_SRC=""
+POSSIBLE_LOCATIONS=(
+    "$SCRIPT_DIR/docker-compose.yml"      # Same directory as script
+    "$ORIGINAL_DIR/docker-compose.yml"    # Original working directory
+    "$HOME/docker-compose.yml"            # Home directory
+    "/root/docker-compose.yml"            # Root home directory
+    "./docker-compose.yml"                # Current directory
+)
+
+for location in "${POSSIBLE_LOCATIONS[@]}"; do
+    if [[ -f "$location" ]]; then
+        DOCKER_COMPOSE_SRC="$location"
+        print_success "Found docker-compose.yml at: $location"
+        break
+    fi
+done
+
+if [[ -n "$DOCKER_COMPOSE_SRC" ]]; then
+    cp "$DOCKER_COMPOSE_SRC" "$INSTALL_DIR/docker-compose.yml"
+    chmod 644 "$INSTALL_DIR/docker-compose.yml"
+    print_success "Docker Compose file copied to: $INSTALL_DIR/docker-compose.yml"
 else
-    print_warning "docker-compose.yml not found in current directory"
+    print_error "docker-compose.yml not found in any of these locations:"
+    for location in "${POSSIBLE_LOCATIONS[@]}"; do
+        echo "  • $location"
+    done
+    print_warning "Please ensure docker-compose.yml is in the same directory as this script, or copy it manually to: $INSTALL_DIR/"
+    exit 1
 fi
+
+# Copy management scripts to installation directory (if they exist in script directory)
+print_info "Copying management scripts..."
+MANAGEMENT_SCRIPTS=("manage-guacamole.sh" "configure-guacamole.sh")
+
+for script in "${MANAGEMENT_SCRIPTS[@]}"; do
+    if [[ -f "$SCRIPT_DIR/$script" ]]; then
+        cp "$SCRIPT_DIR/$script" "$INSTALL_DIR/"
+        chmod +x "$INSTALL_DIR/$script"
+        print_success "Copied $script to installation directory"
+    elif [[ -f "$ORIGINAL_DIR/$script" ]]; then
+        cp "$ORIGINAL_DIR/$script" "$INSTALL_DIR/"
+        chmod +x "$INSTALL_DIR/$script"
+        print_success "Copied $script to installation directory"
+    else
+        print_warning "$script not found, skipping (can be copied manually later)"
+    fi
+done
 
 # Generate database initialization script
 print_info "Generating database initialization script..."
@@ -132,7 +178,25 @@ print_success "Environment configuration created"
 # Start Guacamole stack
 print_info "Starting Guacamole stack..."
 cd "$INSTALL_DIR"
+
+# Verify docker-compose.yml exists in installation directory
+if [[ ! -f "$INSTALL_DIR/docker-compose.yml" ]]; then
+    print_error "docker-compose.yml not found in $INSTALL_DIR"
+    print_error "Cannot start Guacamole stack without docker-compose.yml"
+    exit 1
+fi
+
+print_info "Using docker-compose.yml from: $INSTALL_DIR/docker-compose.yml"
 docker compose up -d >> "$LOG_FILE" 2>&1
+DOCKER_EXIT_CODE=$?
+
+if [[ $DOCKER_EXIT_CODE -ne 0 ]]; then
+    print_error "Docker Compose failed with exit code: $DOCKER_EXIT_CODE"
+    print_info "Checking logs..."
+    docker compose logs >> "$LOG_FILE" 2>&1
+    print_warning "See log file for details: $LOG_FILE"
+    exit $DOCKER_EXIT_CODE
+fi
 
 # Wait for services to be healthy
 print_info "Waiting for services to start (this may take 30-60 seconds)..."
