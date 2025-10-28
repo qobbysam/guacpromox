@@ -1,54 +1,224 @@
-bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~$ sudo journalctl -u xrdp-sesman  -n 50 -f
-Oct 28 15:20:17 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp-sesman.service - xrdp session manager...
-Oct 28 15:20:17 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] starting xrdp-sesman with pid 934
-Oct 28 15:20:17 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Started xrdp-sesman.service - xrdp session manager.
-Oct 28 15:25:13 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Socket 12: AF_INET6 connection received from ::1 port 59888
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Terminal Server Users group is disabled, allowing authentication
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] ++ created session (access granted): username shared-desktop, ip ::ffff:192.168.100.118:62927 - socket: 12
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] starting Xorg session...
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Starting session: session_pid 2646, display :10.0, width 1920, height 1080, bpp 24, client ip ::ffff:192.168.100.118:62927 - socket: 12, user name shared-desktop
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[2646]: [INFO ] [session start] (display 10): calling auth_start_session from pid 2646
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [ERROR] sesman_data_in: scp_process_msg failed
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[2646]: pam_unix(xrdp-sesman:session): session opened for user shared-desktop(uid=1001) by (uid=0)
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [ERROR] sesman_main_loop: trans_check_wait_objs failed, removing trans
-Oct 28 15:25:24 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Process 2646 has exited
-Oct 28 15:25:24 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] ++ terminated session:  username shared-desktop, display :10.0, session_pid 2646, ip ::ffff:192.168.100.118:62927 - socket: 12
+bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~/deployments/guacpromox/bmax-desktop$ ./debug-xrdp.sh 
+
+========================================
+  XRDP Diagnostic Tool
+========================================
 
 
-Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] xrdp_caps_process_codecs: nscodec, codec id 1, properties len 3
-Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [WARN ] xrdp_caps_process_codecs: unknown codec id 5
-Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] Loading keymap file /etc/xrdp/km-00000409.ini
-Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [WARN ] local keymap file for 0x00000409 found and doesn't match built in keymap, using local keymap file
-Oct 28 15:25:13 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] connecting to sesman on 127.0.0.1:3350
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] xrdp_wm_log_msg: sesman connect ok
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] sesman connect ok
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] sending login info to session manager. Please wait...
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] xrdp_wm_log_msg: login successful for user shared-desktop on display 10
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] login successful for user shared-desktop on display 10
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] loaded module 'libxup.so' ok, interface size 10296, version 4
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] started connecting
-Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] lib_mod_connect: connecting via UNIX socket
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] connection problem, giving up
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] some problem
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] SSL_write: I/O error
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_wm_log_msg: Error connecting to user session
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] Error connecting to user session
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_iso_send: trans_write_copy_s failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_mcs_send: xrdp_iso_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send: xrdp_mcs_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_data: xrdp_sec_send failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] Sending [MS-RDPBCGR] TS_SHUTDOWN_DENIED_PDU failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_iso_send: trans_write_copy_s failed
-Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] Sending [ITU T.125] DisconnectProviderUltimatum failed
+========================================
+  1. Checking XFCE4 Installation
+========================================
+
+✓ XFCE4 is installed
+
+Installed XFCE4 packages:
+ii  libxfce4panel-2.0-4                           4.18.4-1ubuntu0.1                        amd64        Xfce4 panel library (GTK3 variant)
+ii  libxfce4ui-2-0:amd64                          4.18.4-1build4                           amd64        widget library for Xfce - Gtk+3 variant
+ii  libxfce4ui-common                             4.18.4-1build4                           all          common files for libxfce4ui
+ii  libxfce4ui-utils                              4.18.4-1build4                           amd64        Utility files for libxfce4ui
+ii  libxfce4util-bin                              4.18.1-2build3                           amd64        tools for libxfce4util
+ii  libxfce4util-common                           4.18.1-2build3                           all          common files for libxfce4util
+ii  libxfce4util7:amd64                           4.18.1-2build3                           amd64        Utility functions library for Xfce4
+ii  xfce4                                         4.18                                     all          Meta-package for the Xfce Lightweight Desktop Environment
+ii  xfce4-appfinder                               4.18.0-1build2                           amd64        Application finder for the Xfce4 desktop environment
+ii  xfce4-battery-plugin:amd64                    1.1.5-1build2                            amd64        battery monitor plugin for the Xfce4 panel
+
+ℹ Checking for XFCE4 binaries:
+✓ startxfce4 found: /usr/bin/startxfce4
+✓ xfce4-session found: /usr/bin/xfce4-session
+
+========================================
+  2. Checking startwm.sh Configuration
+========================================
+
+✓ startwm.sh exists
+
+ℹ File permissions:
+-rwxr-xr-x 1 root root 1515 Oct 28 15:07 /etc/xrdp/startwm.sh
+
+ℹ File contents:
+---
+#!/bin/sh
+# xrdp X session start script (c) 2015, 2017 mirabilos
+# published under The MirOS Licence
+
+if test -r /etc/profile; then
+        . /etc/profile
+fi
+
+if test -r /etc/default/locale; then
+        . /etc/default/locale
+        test -z "${LANG+x}" || export LANG
+        test -z "${LANGUAGE+x}" || export LANGUAGE
+        test -z "${LC_ALL+x}" || export LC_ALL
+        test -z "${LC_COLLATE+x}" || export LC_COLLATE
+        test -z "${LC_CTYPE+x}" || export LC_CTYPE
+        test -z "${LC_MESSAGES+x}" || export LC_MESSAGES
+        test -z "${LC_MONETARY+x}" || export LC_MONETARY
+        test -z "${LC_NUMERIC+x}" || export LC_NUMERIC
+        test -z "${LC_TIME+x}" || export LC_TIME
+fi
+---
+
+✓ startwm.sh references XFCE
+
+========================================
+  3. Checking X Server
+========================================
+
+✓ Xorg found: /usr/bin/Xorg
+/usr/lib/xorg/Xorg.wrap: Only console users are allowed to run the X server
+
+ℹ X server packages:
+ii  xserver-xorg                                  1:7.7+23ubuntu3                          amd64        X.Org X server
+ii  xserver-xorg-core                             2:21.1.12-1ubuntu1.4                     amd64        Xorg X server - core server
+ii  xserver-xorg-dev                              2:21.1.12-1ubuntu1.4                     amd64        Xorg X server - development files
+ii  xserver-xorg-input-all                        1:7.7+23ubuntu3                          amd64        X.Org X server -- input driver metapackage
+ii  xserver-xorg-input-libinput                   1.4.0-1ubuntu24.04.1                     amd64        X.Org X server -- libinput input driver
+
+========================================
+  4. Checking XRDP Services
+========================================
+
+✓ xrdp service is running
+✓ xrdp-sesman service is running
+
+ℹ Service status:
+● xrdp.service - xrdp daemon
+     Loaded: loaded (/usr/lib/systemd/system/xrdp.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2025-10-28 15:20:18 EDT; 19min ago
+       Docs: man:xrdp(8)
+             man:xrdp.ini(5)
+    Process: 936 ExecStartPre=/bin/sh /usr/share/xrdp/socksetup (code=exited, status=0/SUCCESS)
+    Process: 946 ExecStart=/usr/sbin/xrdp $XRDP_OPTIONS (code=exited, status=0/SUCCESS)
+   Main PID: 950 (xrdp)
+      Tasks: 1 (limit: 6843)
+     Memory: 2.3M (peak: 10.4M)
+
+● xrdp-sesman.service - xrdp session manager
+     Loaded: loaded (/usr/lib/systemd/system/xrdp-sesman.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2025-10-28 15:20:17 EDT; 19min ago
+       Docs: man:xrdp-sesman(8)
+             man:sesman.ini(5)
+    Process: 928 ExecStart=/usr/sbin/xrdp-sesman $SESMAN_OPTIONS (code=exited, status=0/SUCCESS)
+   Main PID: 934 (xrdp-sesman)
+      Tasks: 1 (limit: 6843)
+     Memory: 1.7M (peak: 17.7M)
+        CPU: 50ms
+
+========================================
+  5. Recent Session Logs
+========================================
+
+
+ℹ Last 20 lines of xrdp-sesman log:
+[20251028-15:25:14] [INFO ] [session start] (display 10): calling auth_start_session from pid 2646
+[20251028-15:25:14] [ERROR] sesman_data_in: scp_process_msg failed
+[20251028-15:25:14] [ERROR] sesman_main_loop: trans_check_wait_objs failed, removing trans
+[20251028-15:25:14] [INFO ] Starting X server on display 10:  :10 -auth .Xauthority  
+[20251028-15:25:24] [WARN ] Timed out waiting for X server on display 10 to startup
+[20251028-15:25:24] [INFO ] Session started successfully for user shared-desktop on display 10
+[20251028-15:25:24] [INFO ] Session in progress on display 10, waiting until the window manager (pid 2676) exits to end the session
+[20251028-15:25:24] [INFO ] Starting the xrdp channel server for display 10
+[20251028-15:25:24] [WARN ] Timed out waiting for X server on display 10 to startup
+[20251028-15:25:24] [ERROR] There is no X server active on display 10
+[20251028-15:25:24] [ERROR] A fatal error has occurred attempting to start the window manager on display 10, aborting connection
+[20251028-15:25:24] [WARN ] Window manager (pid 2676, display 10) exited quickly (0 secs). This could indicate a window manager config problem
+[20251028-15:25:24] [INFO ] Calling auth_stop_session and auth_end from pid 2646
+[20251028-15:25:24] [INFO ] Terminating X server (pid 2677) on display 10
+[20251028-15:25:24] [INFO ] Terminating the xrdp channel server (pid 2952) on display 10
+[20251028-15:25:24] [INFO ] X server on display 10 (pid 2677) returned exit code 255 and signal number 11
+[20251028-15:25:24] [INFO ] xrdp channel server for display 10 (pid 2952) exit code 0 and signal number 0
+[20251028-15:25:24] [INFO ] cleanup_sockets:
+[20251028-15:25:24] [INFO ] Process 2646 has exited
+[20251028-15:25:24] [INFO ] ++ terminated session:  username shared-desktop, display :10.0, session_pid 2646, ip ::ffff:192.168.100.118:62927 - socket: 12
+
+ℹ Last 10 lines of xrdp log:
+[20251028-15:28:44] [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
+[20251028-15:28:44] [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
+[20251028-15:28:44] [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
+[20251028-15:28:44] [ERROR] xrdp_iso_send: trans_write_copy_s failed
+[20251028-15:28:44] [ERROR] xrdp_mcs_send: xrdp_iso_send failed
+[20251028-15:28:44] [ERROR] xrdp_sec_send: xrdp_mcs_send failed
+[20251028-15:28:44] [ERROR] xrdp_rdp_send_data: xrdp_sec_send failed
+[20251028-15:28:44] [ERROR] Sending [MS-RDPBCGR] TS_SHUTDOWN_DENIED_PDU failed
+[20251028-15:28:44] [ERROR] xrdp_iso_send: trans_write_copy_s failed
+[20251028-15:28:44] [ERROR] Sending [ITU T.125] DisconnectProviderUltimatum failed
+
+========================================
+  6. Checking Directories and Permissions
+========================================
+
+
+ℹ XRDP directories:
+total 40
+drwxr-xr-x  2 xrdp xrdp    4096 Oct 28 14:31 .
+drwxrwxr-x 19 root syslog  4096 Oct 28 15:20 ..
+-rw-r--r--  1 xrdp xrdp   28445 Oct 28 15:28 xrdp.log
+total 8
+drwxr-xr-x  3 xrdp xrdp 100 Oct 28 15:20 .
+drwxr-xr-x 34 root root 860 Oct 28 15:25 ..
+drwxrwsrwt  2 xrdp xrdp  40 Oct 28 15:25 sockdir
+-rw-------  1 xrdp xrdp   3 Oct 28 15:20 xrdp.pid
+-rw-------  1 xrdp xrdp   3 Oct 28 15:20 xrdp-sesman.pid
+
+ℹ X11 socket directories:
+total 8
+drwxrwxrwt  2 root   root   4096 Oct 28 15:20 .
+drwxrwxrwt 17 root   root   4096 Oct 28 15:25 ..
+srwxrwxr-x  1 bmax-1 bmax-1    0 Oct 28 15:20 X0
+srwxrwxr-x  1 bmax-1 bmax-1    0 Oct 28 15:20 X1
+total 8
+drwxrwxrwt  2 root   root   4096 Oct 28 15:20 .
+drwxrwxrwt 17 root   root   4096 Oct 28 15:25 ..
+srwxrwxrwx  1 gdm    gdm       0 Oct 28 15:20 1020
+srwxrwxrwx  1 bmax-1 bmax-1    0 Oct 28 15:20 1700
+
+========================================
+  7. Checking User Configuration
+========================================
+
+✓ User shared-desktop exists
+
+ℹ User info:
+uid=1001(shared-desktop) gid=1001(shared-desktop) groups=1001(shared-desktop)
+
+ℹ Home directory:
+
+ℹ Checking user's .xsession-errors:
+⚠ .xsession-errors not found
+
+========================================
+  8. Checking for Xorg Session Logs
+========================================
+
+⚠ No Xorg session logs found
+
+========================================
+  9. Testing startwm.sh Syntax
+========================================
+
+✓ startwm.sh syntax is valid
+
+========================================
+  10. Common Issues Check
+========================================
+
+
+✓ dbus-daemon is running
+✓ Polkit configuration exists
+✓ XDG_RUNTIME_DIR is configured in startwm.sh
+
+========================================
+  Diagnostic Complete
+========================================
+
+
+ℹ Summary of Issues:
+
+If XFCE4 is not installed, run: sudo ./fix-xrdp-desktop.sh
+If services are down, run: sudo systemctl restart xrdp xrdp-sesman
+Check full logs: sudo journalctl -u xrdp-sesman -n 100
+
+bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~/deployments/guacpromox/bmax-desktop$ 
+
