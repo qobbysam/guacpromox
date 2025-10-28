@@ -88,6 +88,53 @@ if [[ ! -d "$CHROME_MASTER_PROFILE" ]]; then
     exit 1
 fi
 
+# Fix permissions and clean up lock files
+echo -e "${BLUE}ℹ Checking and fixing permissions...${NC}"
+CURRENT_USER=$(whoami)
+
+# Check current ownership
+CURRENT_OWNER=$(stat -c '%U' "$CHROME_MASTER_PROFILE" 2>/dev/null || echo "unknown")
+if [[ "$CURRENT_OWNER" != "$CURRENT_USER" ]]; then
+    echo -e "${YELLOW}⚠ Directory owned by $CURRENT_OWNER, fixing ownership...${NC}"
+    if [[ $EUID -eq 0 ]]; then
+        chown -R "$CURRENT_USER":"$CURRENT_USER" "$CHROME_MASTER_PROFILE"
+        echo -e "${GREEN}✓ Ownership fixed to $CURRENT_USER${NC}"
+    else
+        # Try with sudo if we have permission
+        if sudo chown -R "$CURRENT_USER":"$CURRENT_USER" "$CHROME_MASTER_PROFILE" 2>/dev/null; then
+            echo -e "${GREEN}✓ Ownership fixed to $CURRENT_USER (using sudo)${NC}"
+        else
+            echo -e "${RED}✗ Cannot fix ownership. Please run: sudo chown -R $CURRENT_USER:$CURRENT_USER $CHROME_MASTER_PROFILE${NC}"
+            exit 1
+        fi
+    fi
+fi
+
+# Ensure directory is writable
+chmod 755 "$CHROME_MASTER_PROFILE" 2>/dev/null || sudo chmod 755 "$CHROME_MASTER_PROFILE" 2>/dev/null
+
+# Clean up any existing Chrome lock files that might prevent startup
+LOCK_FILES=(
+    "$CHROME_MASTER_PROFILE/SingletonLock"
+    "$CHROME_MASTER_PROFILE/SingletonCookie"
+    "$CHROME_MASTER_PROFILE/SingletonSocket"
+)
+
+for lock_file in "${LOCK_FILES[@]}"; do
+    if [[ -f "$lock_file" ]] || [[ -S "$lock_file" ]]; then
+        echo -e "${BLUE}ℹ Removing existing lock file: $(basename "$lock_file")${NC}"
+        rm -f "$lock_file" 2>/dev/null || sudo rm -f "$lock_file" 2>/dev/null
+    fi
+done
+
+# Ensure profile subdirectories are writable (if they exist)
+if [[ -d "$CHROME_MASTER_PROFILE" ]]; then
+    chmod -R u+w "$CHROME_MASTER_PROFILE" 2>/dev/null || sudo chmod -R u+w "$CHROME_MASTER_PROFILE" 2>/dev/null
+fi
+
+echo -e "${GREEN}✓ Permissions verified and lock files cleaned${NC}"
+
+echo ""
 echo -e "${BLUE}This script will launch Chrome in master profile configuration mode.${NC}"
 echo ""
 echo -e "${YELLOW}INSTRUCTIONS:${NC}"
