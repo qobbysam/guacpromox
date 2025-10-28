@@ -6,6 +6,7 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 
 - **setup-desktop-vm.sh** - Main setup script for configuring Ubuntu Desktop VM with XRDP and Chrome
 - **fix-xrdp.sh** - Fix script for xrdp startup issues (missing directories/permissions)
+- **fix-xrdp-desktop.sh** - Fix script for "no desktop" issue after XRDP login
 - **post-setup-desktop-vm.sh** - Post-setup script to install Chrome scripts and create desktop shortcut
 - **launch-chrome.sh** - Chrome launcher with session isolation for concurrent users
 - **setup-chrome-master.sh** - Helper script for configuring the master Chrome profile
@@ -87,6 +88,29 @@ This script:
 - Sets proper permissions
 - Adds missing `[Logging]` section to `xrdp.ini` if needed
 - Fixes log file path configuration
+
+**No desktop after XRDP login:**
+If you can connect via RDP and login, but don't see a desktop (blank screen/system error):
+
+1. **Transfer the desktop fix script to your bmax server:**
+   ```bash
+   scp fix-xrdp-desktop.sh user@bmax-server-ip:~/
+   ```
+
+2. **SSH into the server and run it:**
+   ```bash
+   ssh user@bmax-server-ip
+   chmod +x fix-xrdp-desktop.sh
+   sudo ./fix-xrdp-desktop.sh
+   ```
+
+3. **Disconnect and reconnect via RDP** - you should now see the XFCE4 desktop
+
+This script:
+- Installs XFCE4 desktop environment (lightweight and works well with XRDP)
+- Configures `startwm.sh` to properly launch XFCE4
+- Installs build tools and dependencies
+- Fixes polkit authentication issues
 
 ## Maintenance
 

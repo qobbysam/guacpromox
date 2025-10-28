@@ -78,6 +78,16 @@ print_info "Installing XRDP..."
 apt-get install -y xrdp >> "$LOG_FILE" 2>&1
 print_success "XRDP installed"
 
+# Install desktop environment for XRDP
+print_info "Installing XFCE4 desktop environment (required for XRDP)..."
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    xfce4 \
+    xfce4-goodies \
+    xfce4-terminal \
+    dbus-x11 \
+    >> "$LOG_FILE" 2>&1
+print_success "XFCE4 desktop environment installed"
+
 # Configure XRDP for concurrent sessions
 print_info "Configuring XRDP for concurrent sessions..."
 
@@ -167,6 +177,40 @@ EOF
 
 print_success "XRDP configured for concurrent sessions"
 
+# Configure startwm.sh for XFCE4
+print_info "Configuring XRDP session start script..."
+cat > /etc/xrdp/startwm.sh <<'EOF'
+#!/bin/sh
+if test -r /etc/profile; then
+    . /etc/profile
+fi
+if test -r /etc/default/locale; then
+    . /etc/default/locale
+    test -z "${LANG+x}" || export LANG
+    test -z "${LANGUAGE+x}" || export LANGUAGE
+    test -z "${LC_ALL+x}" || export LC_ALL
+fi
+if test -r /etc/profile; then
+    . /etc/profile
+fi
+export DESKTOP_SESSION=xfce
+export XDG_SESSION_DESKTOP=xfce
+export XDG_CURRENT_DESKTOP=XFCE
+export XDG_CONFIG_DIRS=/etc/xdg/xfce4
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+mkdir -p "$XDG_RUNTIME_DIR"
+chmod 700 "$XDG_RUNTIME_DIR"
+if command -v startxfce4 >/dev/null; then
+    exec startxfce4
+elif command -v xfce4-session >/dev/null; then
+    exec xfce4-session
+else
+    exec /etc/X11/Xsession
+fi
+EOF
+chmod +x /etc/xrdp/startwm.sh
+print_success "XRDP session script configured"
+
 # Create XRDP directories and set permissions
 print_info "Creating XRDP directories..."
 mkdir -p /var/log/xrdp
@@ -187,7 +231,7 @@ print_success "Google Chrome installed"
 
 # Install additional dependencies
 print_info "Installing additional dependencies..."
-apt-get install -y rsync jq >> "$LOG_FILE" 2>&1
+apt-get install -y rsync jq build-essential xorg-dev libx11-dev libxfixes-dev >> "$LOG_FILE" 2>&1
 print_success "Dependencies installed"
 
 # Create shared user account
@@ -226,6 +270,21 @@ print_success "XRDP service started"
 print_info "Configuring firewall..."
 ufw allow 3389/tcp >> "$LOG_FILE" 2>&1
 print_success "Firewall configured (port 3389 open)"
+
+# Fix polkit authentication (prevents desktop errors)
+print_info "Configuring polkit authentication..."
+if [ ! -d /etc/polkit-1/localauthority/50-local.d ]; then
+    mkdir -p /etc/polkit-1/localauthority/50-local.d
+fi
+cat > /etc/polkit-1/localauthority/50-local.d/02-allow-colord.pkla <<'POLKITEOF'
+[Allow Colord all Users]
+Identity=unix-user:*
+Action=org.freedesktop.color-manager.create-device;org.freedesktop.color-manager.create-profile;org.freedesktop.color-manager.delete-device;org.freedesktop.color-manager.delete-profile;org.freedesktop.color-manager.modify-device;org.freedesktop.color-manager.modify-profile
+ResultAny=no
+ResultInactive=no
+ResultActive=yes
+POLKITEOF
+print_success "Polkit configured"
 
 # Create Chrome launcher script (will be populated by extraction)
 print_info "Chrome launcher script will be created separately..."
