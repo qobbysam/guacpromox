@@ -5,6 +5,7 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 ## Files in this package
 
 - **setup-desktop-vm.sh** - Main setup script for configuring Ubuntu Desktop VM with XRDP and Chrome
+- **post-setup-desktop-vm.sh** - Post-setup script to install Chrome scripts and create desktop shortcut
 - **launch-chrome.sh** - Chrome launcher with session isolation for concurrent users
 - **setup-chrome-master.sh** - Helper script for configuring the master Chrome profile
 - **cleanup-chrome-sessions.sh** - Automatic cleanup script for old Chrome sessions
@@ -15,27 +16,23 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 1. **Transfer scripts to the Ubuntu Desktop VM:**
    ```bash
    scp setup-desktop-vm.sh shared-desktop@[VM-IP]:~/
+   scp post-setup-desktop-vm.sh shared-desktop@[VM-IP]:~/
    scp launch-chrome.sh shared-desktop@[VM-IP]:~/
    scp setup-chrome-master.sh shared-desktop@[VM-IP]:~/
    scp cleanup-chrome-sessions.sh shared-desktop@[VM-IP]:~/
    ```
 
-2. **Run the setup script:**
+2. **Run the main setup script:**
    ```bash
    ssh shared-desktop@[VM-IP]
    chmod +x setup-desktop-vm.sh
    sudo ./setup-desktop-vm.sh
    ```
 
-3. **Install the Chrome scripts:**
+3. **Run the post-setup script (installs Chrome scripts and creates shortcut):**
    ```bash
-   sudo cp launch-chrome.sh /usr/local/bin/
-   sudo chmod +x /usr/local/bin/launch-chrome.sh
-   
-   sudo cp cleanup-chrome-sessions.sh /usr/local/bin/
-   sudo chmod +x /usr/local/bin/cleanup-chrome-sessions.sh
-   
-   cp setup-chrome-master.sh /home/shared-desktop/
+   chmod +x post-setup-desktop-vm.sh
+   ./post-setup-desktop-vm.sh
    ```
 
 4. **Configure the master Chrome profile:**
@@ -43,25 +40,9 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
    cd ~/
    ./setup-chrome-master.sh
    # Log into all required accounts (Gmail, Salesforce, etc.)
+   # Install required extensions
+   # Set bookmarks
    # Close Chrome when done
-   ```
-
-5. **Create desktop shortcut:**
-   ```bash
-   cat > ~/Desktop/Chrome-Shared.desktop <<'EOF'
-   [Desktop Entry]
-   Version=1.0
-   Type=Application
-   Name=Chrome (Shared Config)
-   Comment=Launch Chrome with shared configuration
-   Exec=/usr/local/bin/launch-chrome.sh
-   Icon=google-chrome
-   Terminal=false
-   Categories=Network;WebBrowser;
-   EOF
-   
-   chmod +x ~/Desktop/Chrome-Shared.desktop
-   gio set ~/Desktop/Chrome-Shared.desktop metadata::trusted true
    ```
 
 ## How it works

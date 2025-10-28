@@ -114,6 +114,7 @@ From your local machine:
 ```bash
 cd guacproject/bmax-desktop
 scp setup-desktop-vm.sh shared-desktop@[DESKTOP-VM-IP]:~/
+scp post-setup-desktop-vm.sh shared-desktop@[DESKTOP-VM-IP]:~/
 scp launch-chrome.sh shared-desktop@[DESKTOP-VM-IP]:~/
 scp setup-chrome-master.sh shared-desktop@[DESKTOP-VM-IP]:~/
 scp cleanup-chrome-sessions.sh shared-desktop@[DESKTOP-VM-IP]:~/
@@ -134,41 +135,28 @@ sudo ./setup-desktop-vm.sh
 - Directory structure created
 - Firewall configured
 
-### 2.3 Install Chrome Scripts
+### 2.3 Install Chrome Scripts and Create Desktop Shortcut
+
+Run the post-setup script to automatically install Chrome scripts and create the desktop shortcut:
 
 ```bash
-# Install launch script
-sudo cp launch-chrome.sh /usr/local/bin/
-sudo chmod +x /usr/local/bin/launch-chrome.sh
-
-# Install cleanup script
-sudo cp cleanup-chrome-sessions.sh /usr/local/bin/
-sudo chmod +x /usr/local/bin/cleanup-chrome-sessions.sh
-
-# Copy master profile setup
-cp setup-chrome-master.sh ~/
+chmod +x post-setup-desktop-vm.sh
+./post-setup-desktop-vm.sh
 ```
 
-### 2.4 Create Chrome Desktop Shortcut
+**What this script does:**
+- Installs launch-chrome.sh to `/usr/local/bin/`
+- Installs cleanup-chrome-sessions.sh to `/usr/local/bin/`
+- Copies setup-chrome-master.sh to home directory
+- Creates "Chrome (Shared Config)" desktop shortcut
+- Sets proper permissions
 
-```bash
-cat > ~/Desktop/Chrome-Shared.desktop <<'EOF'
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Chrome (Shared Config)
-Comment=Launch Chrome with shared configuration
-Exec=/usr/local/bin/launch-chrome.sh
-Icon=google-chrome
-Terminal=false
-Categories=Network;WebBrowser;
-EOF
+**Expected output:**
+- All Chrome scripts installed and executable
+- Desktop shortcut created and trusted
+- Scripts ready to use
 
-chmod +x ~/Desktop/Chrome-Shared.desktop
-gio set ~/Desktop/Chrome-Shared.desktop metadata::trusted true
-```
-
-### 2.5 Configure Master Chrome Profile
+### 2.4 Configure Master Chrome Profile
 
 This is where you log into all accounts that will be shared:
 
