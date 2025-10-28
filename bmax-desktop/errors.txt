@@ -1,42 +1,54 @@
-bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~/deployments/guacpromox/bmax-desktop$ sudo !!
-sudo ./fix-xrdp.sh 
+bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~$ sudo journalctl -u xrdp-sesman  -n 50 -f
+Oct 28 15:20:17 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp-sesman.service - xrdp session manager...
+Oct 28 15:20:17 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] starting xrdp-sesman with pid 934
+Oct 28 15:20:17 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Started xrdp-sesman.service - xrdp session manager.
+Oct 28 15:25:13 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Socket 12: AF_INET6 connection received from ::1 port 59888
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Terminal Server Users group is disabled, allowing authentication
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] ++ created session (access granted): username shared-desktop, ip ::ffff:192.168.100.118:62927 - socket: 12
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] starting Xorg session...
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Starting session: session_pid 2646, display :10.0, width 1920, height 1080, bpp 24, client ip ::ffff:192.168.100.118:62927 - socket: 12, user name shared-desktop
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[2646]: [INFO ] [session start] (display 10): calling auth_start_session from pid 2646
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [ERROR] sesman_data_in: scp_process_msg failed
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[2646]: pam_unix(xrdp-sesman:session): session opened for user shared-desktop(uid=1001) by (uid=0)
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [ERROR] sesman_main_loop: trans_check_wait_objs failed, removing trans
+Oct 28 15:25:24 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] Process 2646 has exited
+Oct 28 15:25:24 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp-sesman[934]: [INFO ] ++ terminated session:  username shared-desktop, display :10.0, session_pid 2646, ip ::ffff:192.168.100.118:62927 - socket: 12
 
-========================================
-  XRDP Fix Script
-========================================
 
-ℹ Creating required directories...
-ℹ Setting permissions...
-✓ Directories created and permissions set
-✓ xrdp user exists
-ℹ Starting xrdp service...
-Job for xrdp.service failed because the control process exited with error code.
-See "systemctl status xrdp.service" and "journalctl -xeu xrdp.service" for details.
-✗ XRDP failed to start
-
-ℹ Check logs with: sudo journalctl -u xrdp -n 50
-bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~/deployments/guacpromox/bmax-desktop$ sudo journalctl -u xrdp -n 50
-Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] address [0.0.0.0] port [3389] mode 1
-Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] listening to port 3389 on 0.0.0.0
-Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] xrdp_listen_pp done
-Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Can't open PID file /run/xrdp/xrdp.pid (>
-Oct 27 21:16:28 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Started xrdp.service - xrdp daemon.
-Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] starting xrdp with pid 4360
-Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] address [0.0.0.0] port [3389] mode 1
-Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] listening to port 3389 on 0.0.0.0
-Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] xrdp_listen_pp done
-Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Stopping xrdp.service - xrdp daemon...
-Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] Received termination signal, stopping the serv>
-Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[7282]: stopping xrdp
-Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[7282]: stopping process id 4360
-Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Deactivated successfully.
-Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Stopped xrdp.service - xrdp daemon.
--- Boot d9855c9eff3c4f74a0c5199f1c9cb423 --
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp.service - xrdp daemon...
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: Could not start log
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: Could not start log
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: error opening log file [The log is not properly started>
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Control process exited, code=exited, sta>
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Failed with result 'exit-code'.
-Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Failed to start xrdp.service - xrdp daemon.
-
+Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] xrdp_caps_process_codecs: nscodec, codec id 1, properties len 3
+Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [WARN ] xrdp_caps_process_codecs: unknown codec id 5
+Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] Loading keymap file /etc/xrdp/km-00000409.ini
+Oct 28 15:24:57 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [WARN ] local keymap file for 0x00000409 found and doesn't match built in keymap, using local keymap file
+Oct 28 15:25:13 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] connecting to sesman on 127.0.0.1:3350
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] xrdp_wm_log_msg: sesman connect ok
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] sesman connect ok
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] sending login info to session manager. Please wait...
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] xrdp_wm_log_msg: login successful for user shared-desktop on display 10
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] login successful for user shared-desktop on display 10
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] loaded module 'libxup.so' ok, interface size 10296, version 4
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] started connecting
+Oct 28 15:25:14 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] lib_mod_connect: connecting via UNIX socket
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] connection problem, giving up
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] some problem
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] SSL_write: I/O error
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_wm_log_msg: Error connecting to user session
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [INFO ] Error connecting to user session
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send_fastpath: xrdp_fastpath_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_fastpath: xrdp_sec_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_orders_send: xrdp_rdp_send_fastpath failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_iso_send: trans_write_copy_s failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_mcs_send: xrdp_iso_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_sec_send: xrdp_mcs_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_rdp_send_data: xrdp_sec_send failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] Sending [MS-RDPBCGR] TS_SHUTDOWN_DENIED_PDU failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] xrdp_iso_send: trans_write_copy_s failed
+Oct 28 15:28:44 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[2639]: [ERROR] Sending [ITU T.125] DisconnectProviderUltimatum failed
