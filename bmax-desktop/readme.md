@@ -5,6 +5,7 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 ## Files in this package
 
 - **setup-desktop-vm.sh** - Main setup script for configuring Ubuntu Desktop VM with XRDP and Chrome
+- **fix-xrdp.sh** - Fix script for xrdp startup issues (missing directories/permissions)
 - **post-setup-desktop-vm.sh** - Post-setup script to install Chrome scripts and create desktop shortcut
 - **launch-chrome.sh** - Chrome launcher with session isolation for concurrent users
 - **setup-chrome-master.sh** - Helper script for configuring the master Chrome profile
@@ -63,6 +64,16 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 3. From another computer, connect as User B to the SAME VM
 4. User B should also be logged into the same accounts
 5. Both users can browse independently
+
+## Troubleshooting
+
+**XRDP won't start (log errors):**
+If xrdp fails to start with "Could not start log" errors, run:
+```bash
+sudo ./fix-xrdp.sh
+```
+
+This script creates the required directories (`/var/log/xrdp` and `/run/xrdp`) and sets proper permissions.
 
 ## Maintenance
 

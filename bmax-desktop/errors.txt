@@ -1,7 +1,34 @@
-Launching Chrome with master profile...
-Master profile location: /opt/chrome-master-profile
 
-[14821:14821:1028/103102.093721:ERROR:chrome/browser/process_singleton_posix.cc:340] Failed to create /opt/chrome-master-profile/SingletonLock: Permission denied (13)
-[14821:14821:1028/103102.095676:ERROR:chrome/app/chrome_main_delegate.cc:505] Failed to create a ProcessSingleton for your profile directory. This means that running multiple instances would start multiple browser processes rather than opening a new window in the existing process. Aborting now to avoid profile corruption.
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp.service - xrdp daemon...
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[944]: Could not start log
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[944]: Could not start log
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[944]: error opening log file [The log is not properly started>
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Control process exited, code=exited, sta>
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Failed with result 'exit-code'.
+Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Failed to start xrdp.service - xrdp daemon.
+bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~$ sudo journalctl -u xrdp
+[sudo] password for bmax-1: 
+Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp.service - xrdp daemon...
+Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] address [0.0.0.0] port [3389] mode 1
+Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] listening to port 3389 on 0.0.0.0
+Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] xrdp_listen_pp done
+Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Can't open PID file /run/xrdp/xrdp.pid (>
+Oct 27 21:16:28 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Started xrdp.service - xrdp daemon.
+Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] starting xrdp with pid 4360
+Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] address [0.0.0.0] port [3389] mode 1
+Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] listening to port 3389 on 0.0.0.0
+Oct 27 21:16:29 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] xrdp_listen_pp done
+Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Stopping xrdp.service - xrdp daemon...
+Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4360]: [INFO ] Received termination signal, stopping the serv>
+Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[7282]: stopping xrdp
+Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[7282]: stopping process id 4360
+Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Deactivated successfully.
+Oct 28 10:01:26 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Stopped xrdp.service - xrdp daemon.
+-- Boot d9855c9eff3c4f74a0c5199f1c9cb423 --
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp.service - xrdp daemon...
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: Could not start log
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: Could not start log
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: error opening log file [The log is not properly started>
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Control process exited, code=exited, sta>
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Failed with result 'exit-code'.
 
-✗ Chrome exited with error code: 0

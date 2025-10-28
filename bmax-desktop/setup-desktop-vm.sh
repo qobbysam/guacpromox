@@ -161,6 +161,16 @@ EOF
 
 print_success "XRDP configured for concurrent sessions"
 
+# Create XRDP directories and set permissions
+print_info "Creating XRDP directories..."
+mkdir -p /var/log/xrdp
+mkdir -p /run/xrdp
+chown xrdp:xrdp /var/log/xrdp
+chown xrdp:xrdp /run/xrdp
+chmod 755 /var/log/xrdp
+chmod 755 /run/xrdp
+print_success "XRDP directories created"
+
 # Install Google Chrome
 print_info "Installing Google Chrome..."
 wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - >> "$LOG_FILE" 2>&1
