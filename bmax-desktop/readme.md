@@ -7,6 +7,8 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 - **setup-desktop-vm.sh** - Main setup script for configuring Ubuntu Desktop VM with XRDP and Chrome
 - **fix-xrdp.sh** - Fix script for xrdp startup issues (missing directories/permissions)
 - **fix-xrdp-desktop.sh** - Fix script for "no desktop" issue after XRDP login
+- **fix-xrdp-xorg.sh** - Fix script for Xorg crashes (signal 11) in Proxmox VMs
+- **debug-xrdp.sh** - Diagnostic tool for troubleshooting XRDP issues
 - **post-setup-desktop-vm.sh** - Post-setup script to install Chrome scripts and create desktop shortcut
 - **launch-chrome.sh** - Chrome launcher with session isolation for concurrent users
 - **setup-chrome-master.sh** - Helper script for configuring the master Chrome profile
@@ -111,6 +113,29 @@ This script:
 - Configures `startwm.sh` to properly launch XFCE4
 - Installs build tools and dependencies
 - Fixes polkit authentication issues
+
+**Xorg crashes (signal 11) in Proxmox VMs:**
+If you see "X server returned exit code 255 and signal number 11" errors:
+
+1. **Transfer the Xorg fix script to your bmax server:**
+   ```bash
+   scp fix-xrdp-xorg.sh user@bmax-server-ip:~/
+   ```
+
+2. **SSH into the server and run it:**
+   ```bash
+   ssh user@bmax-server-ip
+   chmod +x fix-xrdp-xorg.sh
+   sudo ./fix-xrdp-xorg.sh
+   ```
+
+3. **Disconnect and reconnect via RDP** - the X server should no longer crash
+
+This script:
+- Installs Xorg virtualization drivers (dummy, fbdev)
+- Creates Xorg configuration for VM environments
+- Configures X server to work without hardware acceleration
+- Fixes segmentation fault issues in Proxmox VMs
 
 ## Maintenance
 
