@@ -161,12 +161,15 @@ chmod +x post-setup-desktop-vm.sh
 This is where you log into all accounts that will be shared:
 
 ```bash
+# Ensure you're running as shared-desktop user (script will auto-switch if run as root)
 ./setup-chrome-master.sh
 # Log into Gmail, Salesforce, Slack, etc.
 # Install required extensions
 # Set bookmarks
 # Close Chrome when done
 ```
+
+**Note:** If you run this script as root, it will automatically switch to the `shared-desktop` user to avoid Chrome sandbox issues. Chrome cannot run as root without the `--no-sandbox` flag (which is not recommended for security).
 
 ---
 

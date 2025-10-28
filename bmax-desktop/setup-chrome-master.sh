@@ -27,9 +27,45 @@ echo -e "${CYAN}  Chrome Master Profile Setup${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo ""
 
+# Check if running as root
+SHARED_USER="shared-desktop"
+if [[ $EUID -eq 0 ]]; then
+    echo -e "${YELLOW}⚠ Warning: Running as root${NC}"
+    echo -e "${YELLOW}Chrome cannot run as root without --no-sandbox flag.${NC}"
+    echo ""
+    echo -e "${BLUE}Switching to '$SHARED_USER' user to launch Chrome...${NC}"
+    
+    # Check if shared-desktop user exists
+    if ! id "$SHARED_USER" &>/dev/null; then
+        echo -e "${RED}✗ User '$SHARED_USER' does not exist${NC}"
+        echo -e "${RED}  Please run setup-desktop-vm.sh first${NC}"
+        exit 1
+    fi
+    
+    # Switch to shared-desktop user and re-run script
+    # Get script path (portable method)
+    if [[ -L "$0" ]]; then
+        SCRIPT_PATH="$(readlink "$0")"
+        # If readlink doesn't give absolute path, prepend current dir
+        if [[ "$SCRIPT_PATH" != /* ]]; then
+            SCRIPT_PATH="$(dirname "$0")/$SCRIPT_PATH"
+        fi
+    else
+        SCRIPT_PATH="$0"
+    fi
+    # Convert to absolute path if relative
+    if [[ "$SCRIPT_PATH" != /* ]]; then
+        SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$SCRIPT_PATH")"
+    fi
+    
+    echo -e "${BLUE}Executing: sudo -u $SHARED_USER $SCRIPT_PATH${NC}"
+    exec sudo -u "$SHARED_USER" "$SCRIPT_PATH"
+    exit $?
+fi
+
 # Check if running as shared-desktop user
-if [[ "$USER" != "shared-desktop" ]] && [[ "$USER" != "root" ]]; then
-    echo -e "${YELLOW}⚠ Warning: This script should be run as 'shared-desktop' user${NC}"
+if [[ "$USER" != "$SHARED_USER" ]]; then
+    echo -e "${YELLOW}⚠ Warning: This script should be run as '$SHARED_USER' user${NC}"
     echo -e "${YELLOW}  Current user: $USER${NC}"
     echo ""
     read -p "Continue anyway? (y/n): " confirm
@@ -80,16 +116,51 @@ echo -e "${GREEN}Launching Chrome with master profile...${NC}"
 echo -e "${BLUE}Master profile location: $CHROME_MASTER_PROFILE${NC}"
 echo ""
 
+# Set DISPLAY if not set (needed for GUI applications)
+if [[ -z "$DISPLAY" ]]; then
+    export DISPLAY=:0
+    echo -e "${BLUE}Setting DISPLAY=$DISPLAY${NC}"
+fi
+
 # Launch Chrome with master profile
-"$CHROME_BIN" --user-data-dir="$CHROME_MASTER_PROFILE" \
-    --no-first-run \
-    --no-default-browser-check
+# Use no-sandbox if running as root (shouldn't happen after fix above, but safety check)
+CHROME_FLAGS=(
+    "--user-data-dir=$CHROME_MASTER_PROFILE"
+    "--no-first-run"
+    "--no-default-browser-check"
+)
+
+# Only add --no-sandbox if absolutely necessary (not recommended for security)
+# But since we handle root above, this shouldn't be needed
+if [[ $EUID -eq 0 ]]; then
+    echo -e "${YELLOW}⚠ Adding --no-sandbox flag (not recommended for security)${NC}"
+    CHROME_FLAGS+=("--no-sandbox")
+fi
+
+# Launch Chrome
+if ! "$CHROME_BIN" "${CHROME_FLAGS[@]}"; then
+    CHROME_EXIT_CODE=$?
+    echo ""
+    echo -e "${RED}✗ Chrome exited with error code: $CHROME_EXIT_CODE${NC}"
+    
+    if [[ $CHROME_EXIT_CODE -eq 1 ]] && [[ $EUID -eq 0 ]]; then
+        echo -e "${YELLOW}This error often occurs when running Chrome as root.${NC}"
+        echo -e "${YELLOW}Please run this script as '$SHARED_USER' user instead:${NC}"
+        echo -e "${BLUE}  su - $SHARED_USER${NC}"
+        echo -e "${BLUE}  ./setup-chrome-master.sh${NC}"
+    fi
+    
+    exit $CHROME_EXIT_CODE
+fi
 
 echo ""
 echo -e "${CYAN}========================================${NC}"
 echo -e "${CYAN}  Master Profile Configuration${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo ""
+
+# Wait a moment for Chrome to fully close and write profile data
+sleep 2
 
 # Check if profile was created
 if [[ -d "$CHROME_MASTER_PROFILE/Default" ]]; then
