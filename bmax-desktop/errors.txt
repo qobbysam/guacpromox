@@ -1,14 +1,21 @@
+bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~/deployments/guacpromox/bmax-desktop$ sudo !!
+sudo ./fix-xrdp.sh 
 
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp.service - xrdp daemon...
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[944]: Could not start log
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[944]: Could not start log
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[944]: error opening log file [The log is not properly started>
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Control process exited, code=exited, sta>
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Failed with result 'exit-code'.
-Oct 28 14:14:47 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Failed to start xrdp.service - xrdp daemon.
-bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~$ sudo journalctl -u xrdp
-[sudo] password for bmax-1: 
-Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Starting xrdp.service - xrdp daemon...
+========================================
+  XRDP Fix Script
+========================================
+
+ℹ Creating required directories...
+ℹ Setting permissions...
+✓ Directories created and permissions set
+✓ xrdp user exists
+ℹ Starting xrdp service...
+Job for xrdp.service failed because the control process exited with error code.
+See "systemctl status xrdp.service" and "journalctl -xeu xrdp.service" for details.
+✗ XRDP failed to start
+
+ℹ Check logs with: sudo journalctl -u xrdp -n 50
+bmax-1@bmax-1-Standard-PC-i440FX-PIIX-1996:~/deployments/guacpromox/bmax-desktop$ sudo journalctl -u xrdp -n 50
 Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] address [0.0.0.0] port [3389] mode 1
 Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] listening to port 3389 on 0.0.0.0
 Oct 27 21:16:27 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[4358]: [INFO ] xrdp_listen_pp done
@@ -31,4 +38,5 @@ Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: Could not start l
 Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 xrdp[897]: error opening log file [The log is not properly started>
 Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Control process exited, code=exited, sta>
 Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: xrdp.service: Failed with result 'exit-code'.
+Oct 28 10:06:53 bmax-1-Standard-PC-i440FX-PIIX-1996 systemd[1]: Failed to start xrdp.service - xrdp daemon.
 
