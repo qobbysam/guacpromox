@@ -68,12 +68,25 @@ This directory contains all scripts and documentation needed to set up Ubuntu De
 ## Troubleshooting
 
 **XRDP won't start (log errors):**
-If xrdp fails to start with "Could not start log" errors, run:
-```bash
-sudo ./fix-xrdp.sh
-```
+If xrdp fails to start with "Could not start log" errors:
 
-This script creates the required directories (`/var/log/xrdp` and `/run/xrdp`) and sets proper permissions.
+1. **Transfer the fix script to your bmax server:**
+   ```bash
+   scp fix-xrdp.sh user@bmax-server-ip:~/
+   ```
+
+2. **SSH into the server and run it:**
+   ```bash
+   ssh user@bmax-server-ip
+   chmod +x fix-xrdp.sh
+   sudo ./fix-xrdp.sh
+   ```
+
+This script:
+- Creates required directories (`/var/log/xrdp` and `/run/xrdp`)
+- Sets proper permissions
+- Adds missing `[Logging]` section to `xrdp.ini` if needed
+- Fixes log file path configuration
 
 ## Maintenance
 

@@ -55,8 +55,35 @@ chown xrdp:xrdp /var/log/xrdp 2>/dev/null || chown root:root /var/log/xrdp
 chown xrdp:xrdp /run/xrdp 2>/dev/null || chown root:root /run/xrdp
 chmod 755 /var/log/xrdp
 chmod 755 /run/xrdp
+touch /var/log/xrdp/xrdp.log
+chown xrdp:xrdp /var/log/xrdp/xrdp.log 2>/dev/null || chown root:root /var/log/xrdp/xrdp.log
+chmod 644 /var/log/xrdp/xrdp.log
 
 print_success "Directories created and permissions set"
+
+# Fix xrdp.ini logging configuration
+print_info "Checking xrdp.ini configuration..."
+if [ -f /etc/xrdp/xrdp.ini ]; then
+    if ! grep -q "^\[Logging\]" /etc/xrdp/xrdp.ini; then
+        print_info "Adding Logging section to xrdp.ini..."
+        # Backup original
+        cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.backup.$(date +%Y%m%d_%H%M%S)
+        
+        # Add logging section before [Xorg] section using awk
+        awk '/^\[Xorg\]/ {print "[Logging]"; print "LogFile=/var/log/xrdp/xrdp.log"; print "LogLevel=INFO"; print "EnableSyslog=true"; print "SyslogLevel=INFO"; print ""}1' /etc/xrdp/xrdp.ini > /tmp/xrdp.ini.new && mv /tmp/xrdp.ini.new /etc/xrdp/xrdp.ini
+        print_success "Logging configuration added"
+    else
+        print_info "Logging section already exists in xrdp.ini"
+        
+        # Ensure log file path is correct
+        if grep -q "^LogFile=" /etc/xrdp/xrdp.ini; then
+            sed -i 's|^LogFile=.*|LogFile=/var/log/xrdp/xrdp.log|' /etc/xrdp/xrdp.ini
+            print_info "Updated log file path"
+        fi
+    fi
+else
+    print_error "xrdp.ini not found at /etc/xrdp/xrdp.ini"
+fi
 
 # Verify xrdp user exists
 if id "xrdp" &>/dev/null; then

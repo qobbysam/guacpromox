@@ -116,6 +116,12 @@ ls_title=Ubuntu Remote Desktop
 channel_code=1
 xrdp.ini=xrdp.ini
 
+[Logging]
+LogFile=/var/log/xrdp/xrdp.log
+LogLevel=INFO
+EnableSyslog=true
+SyslogLevel=INFO
+
 [Xorg]
 name=Xorg
 lib=libxup.so
